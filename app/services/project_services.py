@@ -32,7 +32,7 @@ def get_project_or_404(project_id: int, db: Session) -> ResearchProjectModel:
 
 def require_project_member(project_id: int, current_user: UserModel = Depends(get_current_user), db: Session = Depends(get_db)) -> ResearchProjectModel:
     project = get_project_or_404(project_id, db)
-    if project.owner_id == current_user.id:  # type: ignore[comparison-overlap]
+    if project.owner_id == current_user.id:
         return project
     membership = db.query(ResearchMemberModel).filter(ResearchMemberModel.project_id == project_id,ResearchMemberModel.user_id == current_user.id).first()
     if membership is None:
@@ -42,7 +42,7 @@ def require_project_member(project_id: int, current_user: UserModel = Depends(ge
 
 def require_project_owner(project_id: int, current_user: UserModel = Depends(get_current_user), db: Session = Depends(get_db)) -> ResearchProjectModel:
     project = get_project_or_404(project_id, db)
-    if project.owner_id != current_user.id:  # type: ignore[comparison-overlap]
+    if project.owner_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Chỉ owner mới được phép thao tác")
     return project
 
@@ -54,7 +54,7 @@ def create_project(data: ResearchProjectCreate, db: Session, current_user: UserM
     db.add(project)
     db.commit()
     db.refresh(project)
-    log_project_activity(db, project.id, current_user.id, "CREATE_PROJECT", f"Project '{name}' da duoc tao.")  # type: ignore[arg-type]
+    log_project_activity(db, project.id, current_user.id, "CREATE_PROJECT", f"Project '{name}' da duoc tao.")
     db.commit()
     return project
 
@@ -84,7 +84,7 @@ def update_project(data: ResearchProjectUpdate, project: ResearchProjectModel, d
         values["name"] = name
     for field, value in values.items():
         setattr(project, field, value)
-    log_project_activity(db, project.id, project.owner_id, "UPDATE_PROJECT", "Project da duoc cap nhat.")  # type: ignore[arg-type]
+    log_project_activity(db, project.id, project.owner_id, "UPDATE_PROJECT", "Project da duoc cap nhat.")
     db.commit()
     db.refresh(project)
     return project
@@ -92,11 +92,11 @@ def update_project(data: ResearchProjectUpdate, project: ResearchProjectModel, d
 
 def delete_project(project: ResearchProjectModel, db: Session) -> None:
     # Xóa mềm: không xóa hẳn row, chỉ đánh dấu deleted và ẩn khỏi giao diện mặc định.
-    if project.is_deleted:  # type: ignore[truthy-function]
+    if project.is_deleted:
         return
-    project.is_deleted = True  # type: ignore[assignment]
-    project.deleted_at = datetime.now()  # type: ignore[assignment]
-    log_project_activity(db, project.id, project.owner_id, "DELETE_PROJECT", "Project da duoc xoa mem.")  # type: ignore[arg-type]
+    project.is_deleted = True
+    project.deleted_at = datetime.now()
+    log_project_activity(db, project.id, project.owner_id, "DELETE_PROJECT", "Project da duoc xoa mem.")
     db.commit()
 
 
@@ -112,11 +112,11 @@ def add_member(data: ResearchMemberCreate, project: ResearchProjectModel, db: Se
     existing = db.query(ResearchMemberModel).filter(ResearchMemberModel.project_id == project.id,ResearchMemberModel.user_id == data.user_id,).first()
     if existing:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User da la thanh vien project")
-    member = ResearchMemberModel(project_id=project.id, user_id=data.user_id, role=data.role.value)
+    member = ResearchMemberModel(project_id=project.id, user_id=data.user_id, role="MEMBER")
     db.add(member)
     db.commit()
     db.refresh(member)
-    log_project_activity(db, project.id, project.owner_id, "ADD_MEMBER", f"Them user {data.user_id} vao project.")  # type: ignore[arg-type]
+    log_project_activity(db, project.id, project.owner_id, "ADD_MEMBER", f"Them user {data.user_id} vao project.")
     db.commit()
     return member
 
@@ -131,5 +131,5 @@ def remove_member(user_id: int, project: ResearchProjectModel, db: Session) -> N
     if member is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Khong tim thay thanh vien")
     db.delete(member)
-    log_project_activity(db, project.id, project.owner_id, "REMOVE_MEMBER", f"Xoa user {user_id} khoi project.")  # type: ignore[arg-type]
+    log_project_activity(db, project.id, project.owner_id, "REMOVE_MEMBER", f"Xoa user {user_id} khoi project.")
     db.commit()

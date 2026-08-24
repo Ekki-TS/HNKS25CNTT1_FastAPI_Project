@@ -109,6 +109,27 @@ curl.exe -H "Authorization: Bearer $token" http://127.0.0.1:8000/projects
 curl.exe -H "Authorization: Bearer $token" "http://127.0.0.1:8000/projects/$projectId/tasks"
 ```
 
+### 7. Comment và file đính kèm
+
+Chỉ thành viên của project mới xem hoặc tạo comment, xem danh sách file, upload
+và download file của task:
+
+```powershell
+curl.exe -H "Authorization: Bearer $token" "http://127.0.0.1:8000/tasks/$taskId/comments"
+
+curl.exe -X POST "http://127.0.0.1:8000/tasks/$taskId/comments" `
+	-H "Authorization: Bearer $token" `
+	-H "Content-Type: application/json" `
+	-d '{"content":"Cần review phần này"}'
+
+curl.exe -X POST "http://127.0.0.1:8000/tasks/$taskId/attachments" `
+	-H "Authorization: Bearer $token" `
+	-F "file=@notes.txt"
+```
+
+File được giới hạn 10 MB, chỉ nhận các loại file phổ biến như PDF, Word, Excel,
+ảnh, ZIP và TXT. File được lưu trong thư mục `uploads/tasks`.
+
 ## Các nhóm endpoint chính
 
 | Nhóm | Endpoint tiêu biểu | Yêu cầu xác thực |
@@ -118,6 +139,8 @@ curl.exe -H "Authorization: Bearer $token" "http://127.0.0.1:8000/projects/$proj
 | Users | `/users` | JWT, một số thao tác cần quyền phù hợp |
 | Projects | `/projects` | JWT |
 | Tasks | `/projects/{project_id}/tasks` | JWT và thành viên project |
+| Comments | `/tasks/{task_id}/comments` | JWT và thành viên project |
+| Attachments | `/tasks/{task_id}/attachments` | JWT và thành viên project |
 
 Có thể xem đầy đủ schema request/response và thử API trực tiếp trên Swagger UI tại `/docs`.
 

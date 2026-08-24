@@ -37,7 +37,7 @@ class ResearchTaskUpdate(BaseModel):
     due_date: Optional[datetime] = None
     assignee_id: Optional[int] = None
 
-# Thông tin nhiệm vụ 
+# Thông tin nhiệm vụ  
 class ResearchTaskResponse(ResearchTaskBase):
     id: int
     project_id: int
@@ -45,3 +45,37 @@ class ResearchTaskResponse(ResearchTaskBase):
     
     # Cho phép tạo response từ SQLAlchemy model.
     model_config = ConfigDict(from_attributes=True)
+
+
+class TaskCommentCreate(BaseModel):
+    content: str = Field(..., min_length=1, max_length=5000)
+
+
+class TaskCommentResponse(BaseModel):
+    id: int
+    task_id: int
+    user_id: int
+    content: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TaskAttachmentResponse(BaseModel):
+    id: int
+    task_id: int
+    uploader_id: int
+    original_name: str
+    content_type: str
+    file_size: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TaskListResponse(BaseModel):
+    items: list[ResearchTaskResponse]
+    total: int
+    limit: int
+    offset: int
+    page: int

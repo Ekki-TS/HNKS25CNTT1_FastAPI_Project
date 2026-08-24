@@ -38,9 +38,9 @@ class ResearchMemberBase(BaseModel):
     user_id: int
     role: MemberRole = MemberRole.MEMBER
 
-# Tạo thành viên
-class ResearchMemberCreate(ResearchMemberBase):
-    pass
+# Tạo thành viên, role luôn mặc định là MEMBER và không cho client lựa chọn.
+class ResearchMemberCreate(BaseModel):
+    user_id: int
 
 # Cập nhật thành viên
 class ResearchMemberUpdate(BaseModel):
@@ -52,4 +52,37 @@ class ResearchMemberResponse(ResearchMemberBase):
     joined_at: datetime
 
     # Cho phép Pydantic đọc thuộc tính của ResearchMemberModel.
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ResearchProjectTitleCreate(BaseModel):
+    title: str = Field(..., min_length=1, max_length=255)
+    description: Optional[str] = None
+
+
+class ResearchProjectTitleUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=1, max_length=255)
+    description: Optional[str] = None
+
+
+class ProjectResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    owner_id: int
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class MemberAdd(BaseModel):
+    user_id: int
+
+
+class MemberResponse(BaseModel):
+    project_id: int
+    user_id: int
+    role: str
+    joined_at: datetime
+
     model_config = ConfigDict(from_attributes=True)

@@ -13,7 +13,7 @@ class MessageResponse(BaseModel):
     """Schema trả về thông báo thành công/thất bại cho client"""
     message: str
     success: bool = True
-    data: Optional[dict] = None  # Có thể chứa dữ liệu bổ sung như id
+    data: Optional[dict] = None 
     
 # Thông tin người dùng cơ bản
 class UserBase(BaseModel):

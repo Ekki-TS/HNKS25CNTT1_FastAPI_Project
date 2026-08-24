@@ -9,7 +9,7 @@ from app.services.auth_service import login_user, register_user
 
 router = APIRouter(prefix="/auth", tags=["AuthN"])
 
-@router.post("/register", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=MessageResponse, status_code=status.HTTP_201_CREATED, summary="Đăng ký tài khoản")
 def register(data: UserCreate, db: Session = Depends(get_db)):
     """Đăng ký tài khoản mới - trả về message thành công với id"""
     user_info = register_user(data, db)
@@ -24,12 +24,12 @@ def register(data: UserCreate, db: Session = Depends(get_db)):
     )
 
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=Token, summary="Đăng nhập")
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     """Đăng nhập - trả về access token"""
     return login_user(data, db)
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me", response_model=UserResponse, summary="Lấy thông tin người dùng")
 def get_me(current_user: UserModel = Depends(get_current_user)):
     """Lấy thông tin người dùng hiện tại"""
     return current_user

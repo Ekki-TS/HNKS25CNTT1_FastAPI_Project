@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.core.config import register_exception_handlers
+from app.core.exceptions import register_exception_handlers
 from app.db.database import Base, engine
 from app.models import project, task, user
 from app.routers.auth import router as auth_router
@@ -11,7 +11,7 @@ from app.routers.tasks import router as tasks_router
 # Import model trước để SQLAlchemy biết toàn bộ bảng khi tạo metadata.
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(title="Research Management API")
 
 register_exception_handlers(app)
 # Đăng ký các router theo từng nhóm chức năng.
